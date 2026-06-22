@@ -4,8 +4,12 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    reviewers:
+      - Katyara11
 
   - package-ecosystem: terraform
     directory: /
     schedule:
       interval: weekly
+    reviewers:
+      - Katyara11
