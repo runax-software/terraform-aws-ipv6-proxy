@@ -28,7 +28,7 @@ single `tofu apply` / `terraform apply` is all you run.
 
 ```hcl
 module "ipv6_proxy" {
-  source = "github.com/runax-software/terraform-aws-ipv6-proxy"
+  source = "github.com/runax-software/terraform-aws-ipv6-proxy?ref=v1.0.0"
 
   instance_count         = 3
   existing_key_pair_name = "my-keypair"
