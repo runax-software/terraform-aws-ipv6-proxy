@@ -1,0 +1,14 @@
+[Unit]
+Description=3proxy Proxy Server (SOCKS5 IPv6 egress)
+After=network-online.target assign-pd-addrs.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/3proxy /etc/3proxy/3proxy.cfg
+Restart=always
+RestartSec=2
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

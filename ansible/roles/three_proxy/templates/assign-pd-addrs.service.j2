@@ -1,0 +1,11 @@
+[Unit]
+Description=Assign IPv6 /128s from delegated prefix
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/assign-pd-addrs.sh
+
+[Install]
+WantedBy=multi-user.target

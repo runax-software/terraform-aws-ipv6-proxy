@@ -1,0 +1,7 @@
+#!/bin/bash
+set -euo pipefail
+# shellcheck source=/dev/null
+source /etc/ipv6-pd.conf
+for i in $(seq "$START" "$END"); do
+  ip -6 addr add "${PREFIX}::${i}/128" dev "$IFACE" 2>/dev/null || true
+done

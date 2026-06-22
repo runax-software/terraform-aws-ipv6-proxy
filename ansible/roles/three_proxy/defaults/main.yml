@@ -1,0 +1,19 @@
+---
+threeproxy_repo: "https://github.com/z3APA3A/3proxy.git"
+
+# Proxy authentication: set both for "strong" auth, leave both empty for none.
+proxy_user: ""
+proxy_pass: ""
+
+# IPv6 prefix delegated to the ENI, e.g. "2600:1f18:abcd:1200::/80".
+# Supplied by Terraform via extra-vars; required.
+proxy_ipv6_prefix: ""
+
+# /128 addresses are carved from the prefix at indices [start, start + count).
+proxy_assign_start: 10
+proxy_assign_count: 10
+
+# One listener is created per assigned IPv6, numbered from the base ports.
+proxy_socks_base_port: 11000 # IPv6 listeners
+proxy_v4_base_port: 21000    # IPv4 listeners (egress still over IPv6)
+proxy_ipv4_listen: true

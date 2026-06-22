@@ -1,0 +1,123 @@
+---
+# Install
+- name: Check whether 3proxy is already installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/3proxy
+  register: threeproxy_bin
+
+- name: Install build dependencies
+  ansible.builtin.apt:
+    name:
+      - build-essential
+      - git
+    update_cache: true
+  when: not threeproxy_bin.stat.exists
+
+- name: Clone 3proxy source
+  ansible.builtin.git:
+    repo: "{{ threeproxy_repo }}"
+    dest: /usr/local/src/3proxy
+    depth: 1
+    version: HEAD
+  when: not threeproxy_bin.stat.exists
+
+- name: Build 3proxy
+  ansible.builtin.command:
+    cmd: make -f Makefile.Linux
+    chdir: /usr/local/src/3proxy
+    creates: /usr/local/src/3proxy/bin/3proxy
+  when: not threeproxy_bin.stat.exists
+
+- name: Install 3proxy binary
+  ansible.builtin.copy:
+    src: /usr/local/src/3proxy/bin/3proxy
+    dest: /usr/local/bin/3proxy
+    mode: "0755"
+    remote_src: true
+  when: not threeproxy_bin.stat.exists
+
+- name: Ensure 3proxy directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - /etc/3proxy
+    - /var/log/3proxy
+
+# Configure
+- name: Require an IPv6 prefix
+  ansible.builtin.assert:
+    that:
+      - proxy_ipv6_prefix | length > 0
+    fail_msg: "proxy_ipv6_prefix is required (e.g. 2600:xxxx::/80)."
+
+- name: Derive IPv6 prefix base (strip mask and trailing '::')
+  ansible.builtin.set_fact:
+    proxy_prefix_base: "{{ proxy_ipv6_prefix | regex_replace('/.*$', '') | regex_replace('::$', '') }}"
+
+- name: Detect default IPv6 egress interface
+  ansible.builtin.shell: |
+    set -o pipefail
+    ip -6 route show default | awk '{for (i = 1; i <= NF; i++) if ($i == "dev") {print $(i + 1); exit}}'
+  args:
+    executable: /bin/bash
+  register: proxy_iface_cmd
+  changed_when: false
+
+- name: Set egress interface fact
+  ansible.builtin.set_fact:
+    proxy_iface: "{{ proxy_iface_cmd.stdout | trim if (proxy_iface_cmd.stdout | trim | length > 0) else 'eth0' }}"
+
+- name: Build list of /128 egress addresses
+  ansible.builtin.set_fact:
+    proxy_ipv6_addresses: "{{ (proxy_ipv6_addresses | default([])) + [proxy_prefix_base ~ '::' ~ item] }}"
+  loop: "{{ range(proxy_assign_start | int, (proxy_assign_start | int) + (proxy_assign_count | int)) | list }}"
+
+- name: Write IPv6 prefix-delegation config
+  ansible.builtin.template:
+    src: ipv6-pd.conf.j2
+    dest: /etc/ipv6-pd.conf
+    mode: "0600"
+
+- name: Install IPv6 address assignment script
+  ansible.builtin.template:
+    src: assign-pd-addrs.sh.j2
+    dest: /usr/local/sbin/assign-pd-addrs.sh
+    mode: "0755"
+
+- name: Install IPv6 address assignment service
+  ansible.builtin.template:
+    src: assign-pd-addrs.service.j2
+    dest: /etc/systemd/system/assign-pd-addrs.service
+    mode: "0644"
+
+- name: Enable and run IPv6 address assignment
+  ansible.builtin.systemd:
+    name: assign-pd-addrs.service
+    enabled: true
+    state: restarted
+    daemon_reload: true
+
+- name: Render 3proxy configuration
+  ansible.builtin.template:
+    src: 3proxy.cfg.j2
+    dest: /etc/3proxy/3proxy.cfg
+    owner: root
+    group: root
+    mode: "0600"
+  notify: Restart 3proxy
+
+- name: Install 3proxy systemd unit
+  ansible.builtin.template:
+    src: 3proxy.service.j2
+    dest: /etc/systemd/system/3proxy.service
+    mode: "0644"
+  notify: Restart 3proxy
+
+- name: Enable and start 3proxy
+  ansible.builtin.systemd:
+    name: 3proxy
+    enabled: true
+    state: started
+    daemon_reload: true

@@ -1,0 +1,4 @@
+PREFIX={{ proxy_prefix_base }}
+IFACE={{ proxy_iface }}
+START={{ proxy_assign_start }}
+END={{ proxy_assign_start | int + proxy_assign_count | int - 1 }}
