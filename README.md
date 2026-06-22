@@ -1,6 +1,6 @@
 # terraform-aws-ipv6-proxy
 
-Terraform/OpenTofu module that provisions a fleet of **IPv6 SOCKS5 proxy nodes
+OpenTofu/Terraform module that provisions a fleet of **IPv6 SOCKS5 proxy nodes
 on AWS**, powered by [3proxy](https://github.com/z3APA3A/3proxy). Each node lives
 in its own subnet (network isolation, unique IPv6 prefix per node) and is
 configured entirely by **Ansible**, which runs locally on the instance at first
@@ -22,7 +22,7 @@ internet gateway. On boot each node:
 5. runs any roles you supplied via `extra_roles`.
 
 No SSH access, no local Ansible install, and no provisioners are required — a
-single `terraform apply` / `tofu apply` is all you run.
+single `tofu apply` / `terraform apply` is all you run.
 
 ## Usage
 
