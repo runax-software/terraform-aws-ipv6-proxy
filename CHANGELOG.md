@@ -13,4 +13,4 @@ Initial stable release.
 - Optional proxy authentication (`proxy_user` / `proxy_pass`, both-or-neither, enforced by a precondition).
 - Optional Prometheus `node_exporter`, with its port opened in the security group when enabled.
 - Extensible via `extra_roles` — ship user-supplied Ansible roles into the node without editing the module.
-- Secure defaults: IMDSv2 required (`http_tokens = "required"`) and `proxy_pass` marked `sensitive`.
+- Secure defaults: IMDSv2 required (`http_tokens = "required"`), encrypted root EBS volume, the VPC default security group locked down to deny all, no SSH ingress unless `ssh_ingress_cidrs` is set, and `proxy_pass` marked `sensitive`.

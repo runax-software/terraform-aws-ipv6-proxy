@@ -30,6 +30,12 @@ variable "ec2_instance_type" {
   default     = "t3.micro"
 }
 
+variable "ssh_ingress_cidrs" {
+  description = "CIDR blocks allowed to reach SSH (TCP 22). IPv4 and IPv6 CIDRs may be mixed. Empty (the default) creates no SSH ingress rule at all."
+  type        = list(string)
+  default     = []
+}
+
 variable "root_volume_type" {
   description = "EBS volume type for the root block device."
   type        = string

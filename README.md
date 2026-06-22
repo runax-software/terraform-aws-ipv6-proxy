@@ -74,6 +74,7 @@ No edits to this module are needed.
 | `existing_key_pair_name` | — (required) | Existing EC2 key pair name |
 | `ipv4_cidr` | `10.10.0.0/16` | VPC IPv4 CIDR (per-node /24s carved from it) |
 | `ec2_instance_type` | `t3.micro` | Instance type |
+| `ssh_ingress_cidrs` | `[]` | CIDRs allowed to reach SSH (port 22); IPv4/IPv6 may be mixed. Empty = no SSH rule at all |
 | `proxy_user` / `proxy_pass` | `""` | Proxy auth; both set = `strong`, both empty = none |
 | `proxy_assign_start` / `proxy_assign_count` | `10` / `10` | Range of `/128`s carved from the delegated prefix |
 | `proxy_port_range_v4` / `proxy_port_range_v6` | `21000-22000` / `11000-12000` | Listener port ranges (`from` = base port); also opened in the SG |

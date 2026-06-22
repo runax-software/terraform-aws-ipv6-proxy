@@ -1,0 +1,18 @@
+# Checkov configuration for terraform-aws-ipv6-proxy.
+#
+# These nodes are public-internet SOCKS5 proxies, so a number of Checkov
+# "misconfigurations" are intentional and accepted for this module. Every skip
+# below is a deliberate, documented decision — not a blanket bypass.
+framework:
+  - terraform
+compact: true
+quiet: true
+skip-check:
+  - CKV_AWS_24   # SSH ingress is opt-in via var.ssh_ingress_cidrs (default: none); the gate is invisible to static analysis
+  - CKV_AWS_130  # Proxy nodes must be publicly reachable, so subnets assign public IPs by design
+  - CKV_AWS_382  # A forward proxy must reach arbitrary internet hosts; broad egress is required
+  - CKV_AWS_126  # Detailed monitoring is a per-deployment cost decision, left to the consumer
+  - CKV_AWS_135  # EBS optimization is instance-type dependent (the default t3 family is already EBS-optimized)
+  - CKV2_AWS_11  # VPC flow logging is a consumer compliance/cost decision
+  - CKV2_AWS_41  # Proxy nodes do not call AWS APIs, so no IAM instance role is attached
+  - CKV2_AWS_5   # Security groups are attached to ENIs; the graph check does not trace ENI attachment

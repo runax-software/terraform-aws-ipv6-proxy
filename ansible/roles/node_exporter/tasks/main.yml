@@ -16,7 +16,7 @@
 
 - name: Download and extract node_exporter
   ansible.builtin.unarchive:
-    src: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_arch }}.tar.gz"
+    src: "{{ node_exporter_base_url }}/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_arch }}.tar.gz"
     dest: /tmp
     remote_src: true
   when: node_exporter_version not in node_exporter_current

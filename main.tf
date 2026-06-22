@@ -6,6 +6,9 @@ locals {
   security_group_name    = "${var.name_prefix}-security-group"
   network_interface_name = "${var.name_prefix}-network-interface"
   instance_name          = "${var.name_prefix}-instance"
+
+  ssh_ipv4_cidrs = [for c in var.ssh_ingress_cidrs : c if !strcontains(c, ":")]
+  ssh_ipv6_cidrs = [for c in var.ssh_ingress_cidrs : c if strcontains(c, ":")]
 }
 
 # Networking
@@ -25,6 +28,15 @@ resource "aws_internet_gateway" "this" {
 
   tags = {
     Name = local.internet_gateway_name
+  }
+}
+
+# Take over the VPC's default security group and deny all traffic (no rules).
+resource "aws_default_security_group" "this" {
+  vpc_id = aws_vpc.this.id
+
+  tags = {
+    Name = "${var.name_prefix}-default-security-group"
   }
 }
 
@@ -93,13 +105,16 @@ resource "aws_security_group" "this" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  ingress {
-    description      = "ssh"
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+  dynamic "ingress" {
+    for_each = length(var.ssh_ingress_cidrs) > 0 ? [1] : []
+    content {
+      description      = "ssh"
+      from_port        = 22
+      to_port          = 22
+      protocol         = "tcp"
+      cidr_blocks      = local.ssh_ipv4_cidrs
+      ipv6_cidr_blocks = local.ssh_ipv6_cidrs
+    }
   }
 
   ingress {
@@ -133,6 +148,7 @@ resource "aws_security_group" "this" {
   }
 
   egress {
+    description      = "all outbound"
     from_port        = 0
     to_port          = 0
     protocol         = "-1"
@@ -179,6 +195,7 @@ resource "aws_instance" "this" {
     volume_type           = var.root_volume_type
     volume_size           = var.root_volume_size
     delete_on_termination = true
+    encrypted             = true
   }
 
   metadata_options {

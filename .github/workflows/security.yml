@@ -9,16 +9,14 @@ permissions:
   contents: read
 
 jobs:
-  trivy:
-    name: Trivy IaC scan
+  checkov:
+    name: Checkov IaC scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run Trivy (config scan)
-        uses: aquasecurity/trivy-action@v0.36.0
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
         with:
-          scan-type: config
-          scan-ref: .
-          severity: HIGH,CRITICAL
-          exit-code: "1"
+          directory: .
+          config_file: .checkov.yaml

@@ -1,0 +1,11 @@
+---
+skip_list:
+  # Role variables are the Terraform -> Ansible contract: they are rendered into
+  # /opt/ipv6-proxy/extra-vars.json by cloudinit.tf and passed with `-e`. They
+  # intentionally match the module's Terraform variable names (proxy_user,
+  # node_exporter_*, etc.), so a per-role `three_proxy_`/`node_exporter_` prefix
+  # would be wrong.
+  - var-naming[no-role-prefix]
+  # 3proxy is cloned from a user-configurable repository (var.threeproxy_repo)
+  # and built from source; pinning a fixed git ref here is not desired.
+  - latest[git]
