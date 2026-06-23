@@ -19,4 +19,4 @@ jobs:
         uses: bridgecrewio/checkov-action@v12
         with:
           directory: .
-          config_file: .checkov.yaml
+          config_file: .github/.checkov.yaml
