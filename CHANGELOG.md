@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.0
+
+### Features
+
+- Add `extra_vars` input — a sensitive `map(string)` merged into the Ansible extra-vars passed to the play, so `extra_roles` can receive configuration and secrets from Terraform. Module-owned keys take precedence on collision.
+
 ## v1.0.0
 
 Initial stable release.

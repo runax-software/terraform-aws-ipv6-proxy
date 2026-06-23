@@ -28,7 +28,7 @@ single `tofu apply` / `terraform apply` is all you run.
 
 ```hcl
 module "ipv6_proxy" {
-  source = "github.com/runax-software/terraform-aws-ipv6-proxy?ref=v1.0.0"
+  source = "github.com/runax-software/terraform-aws-ipv6-proxy?ref=v1.1.0"
 
   instance_count         = 3
   existing_key_pair_name = "my-keypair"
@@ -65,6 +65,17 @@ roles/install_redis/
 
 No edits to this module are needed.
 
+Pass configuration (including secrets) to your roles via `extra_vars`. It is
+merged into the Ansible extra-vars the play already receives, so your role can
+read the keys directly:
+
+```hcl
+extra_vars = {
+  redis_version = "7.2"
+  redis_password = var.redis_password   # sensitive
+}
+```
+
 ## Key inputs
 
 | Variable | Default | Description |
@@ -83,6 +94,7 @@ No edits to this module are needed.
 | `node_exporter_version` | `1.9.1` | node_exporter version |
 | `threeproxy_repo` | `z3APA3A/3proxy` | Git repo to build 3proxy from |
 | `extra_roles` | `[]` | Extra Ansible roles to run (see above) |
+| `extra_vars` | `{}` | Extra Ansible variables (`map(string)`, sensitive) merged into the play's extra-vars — typically config/secrets consumed by `extra_roles`. Module-owned keys always win on collision |
 
 See [`variables.tf`](variables.tf) for the full list.
 

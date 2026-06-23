@@ -155,3 +155,22 @@ variable "extra_roles" {
   }))
   default = []
 }
+
+variable "extra_vars" {
+  description = <<-EOT
+    Additional variables merged into the Ansible extra-vars passed to the play
+    (e.g. configuration consumed by `extra_roles`). Keys that collide with the
+    module's own extra-vars are ignored — the module's values always win. Values
+    are strings; cast numbers/booleans on the consuming side. Marked sensitive,
+    so it is safe to pass secrets such as registry credentials.
+
+      extra_vars = {
+        node_api_image  = "ghcr.io/org/node-api:latest"
+        github_username = "ci-bot"
+        github_token    = var.github_token
+      }
+  EOT
+  type        = map(string)
+  default     = {}
+  sensitive   = true
+}

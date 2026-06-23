@@ -56,7 +56,7 @@ data "cloudinit_config" "this" {
               path        = "/opt/ipv6-proxy/extra-vars.json"
               owner       = "root:root"
               permissions = "0600"
-              content = jsonencode({
+              content = jsonencode(merge(var.extra_vars, {
                 proxy_ipv6_prefix     = try(tolist(aws_network_interface.this[count.index].ipv6_prefixes)[0], "")
                 proxy_user            = var.proxy_user
                 proxy_pass            = var.proxy_pass
@@ -69,7 +69,7 @@ data "cloudinit_config" "this" {
                 node_exporter_version = var.node_exporter_version
                 node_exporter_port    = var.node_exporter_port
                 extra_roles           = local.extra_role_names
-              })
+              }))
             }
           ]
         )
