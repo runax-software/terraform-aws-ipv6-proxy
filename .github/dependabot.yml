@@ -7,7 +7,6 @@ updates:
       interval: weekly
     labels:
       - chore
-      - dependencies
       - github_actions
     groups:
       github-actions:
@@ -21,7 +20,6 @@ updates:
       interval: weekly
     labels:
       - chore
-      - dependencies
       - terraform
     groups:
       terraform:
