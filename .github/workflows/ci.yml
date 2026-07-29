@@ -9,8 +9,8 @@ permissions:
   contents: read
 
 jobs:
-  validate:
-    name: validate (${{ matrix.tool }})
+  validate-matrix:
+    name: validate-matrix (${{ matrix.tool }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -44,6 +44,21 @@ jobs:
 
       - name: Validate
         run: ${{ matrix.cmd }} validate
+
+  # Stable gate so branch protection can require the single "validate" context
+  # instead of the per-tool matrix contexts, which leave checks pending forever
+  # whenever the matrix changes.
+  validate:
+    runs-on: ubuntu-latest
+    needs: [validate-matrix]
+    if: always()
+    steps:
+      - name: Verify matrix result
+        run: |
+          if [ "${{ needs.validate-matrix.result }}" != "success" ]; then
+            echo "::error::validate-matrix did not succeed (result: ${{ needs.validate-matrix.result }})"
+            exit 1
+          fi
 
   tflint:
     name: tflint
