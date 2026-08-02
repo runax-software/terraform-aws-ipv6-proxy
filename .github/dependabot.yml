@@ -1,15 +1,27 @@
 version: 2
 updates:
+  # GitHub Actions used by the workflows.
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
-    reviewers:
-      - Katyara11
+    labels:
+      - chore
+      - github_actions
+    groups:
+      github-actions:
+        patterns:
+          - "*"
 
+  # Terraform providers and modules.
   - package-ecosystem: terraform
     directory: /
     schedule:
       interval: weekly
-    reviewers:
-      - Katyara11
+    labels:
+      - chore
+      - terraform
+    groups:
+      terraform:
+        patterns:
+          - "*"
