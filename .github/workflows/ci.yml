@@ -45,6 +45,9 @@ jobs:
       - name: Validate
         run: ${{ matrix.cmd }} validate
 
+      - name: Test
+        run: ${{ matrix.cmd }} test
+
   # Stable gate so branch protection can require the single "validate" context
   # instead of the per-tool matrix contexts, which leave checks pending forever
   # whenever the matrix changes.
