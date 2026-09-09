@@ -46,6 +46,7 @@ prefer:
 tofu fmt -recursive          # CI runs with -check
 tofu init -backend=false
 tofu validate
+tofu test                    # native tests in tests/*.tftest.hcl, mocked providers — no AWS needed
 
 tflint --init && tflint      # GITHUB_TOKEN avoids rate limits for plugin download
 
